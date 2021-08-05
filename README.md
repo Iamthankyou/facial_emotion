@@ -1,3 +1,4 @@
+Facial Emotion with CNN accuracy = 80%, ferplus
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
