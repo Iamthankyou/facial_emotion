@@ -7,17 +7,15 @@ import Camera from "./Camera/Camera"
 import Switch from "react-switch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createFaLibrary } from "./icons";
-
-
-
-
+import ImageUploading from 'react-images-uploading'
 
 
 loadModels();
 createFaLibrary();
 function App() {
 
-  const MODEL_PATH = './jsmodel/model.json';
+  // const MODEL_PATH = './jsmodel/model.json';
+  const MODEL_PATH = './modelsjs2/model.json';
 
   const INDEXEDDB_DB = 'tensorflowjs';
   const INDEXEDDB_STORE = 'model_info_store';
@@ -60,6 +58,9 @@ function App() {
     if (camera.current !== null) {
       const faces = await detectFaces(camera.current.video);
       var src = camera.current.getScreenshot();
+
+      
+
       var results = await drawResults(
         camera.current.video,
         cameraCanvas.current,
@@ -70,19 +71,21 @@ function App() {
         model
       )
 
-      var expressions = ["angry", "disgusted", "afraid", "happy", "sad", "surprised", "neutral"]
+      // var expressions = ['bình thường', 'hạnh phúc', 'ngạc nhiên', 'buồn chán', 'tức giận', 'ngạc nhiên', 'sợ hãi', 'khinh thường']
+      // var expressions = ["giận dữ", "chán ghét", "sợ hãi", "hạnh phúc", "sầu đời", "ngạc nhiên", "bình thường :D", "Khinh thường"]
+      var expressions = ["giận dữ", "chán ghét", "sợ hãi", "hạnh phúc", "sầu đời", "ngạc nhiên", "bình thường", "khinh thường"]
 
       if (results !== undefined) {
         var max = results.reduce(function (a, b) {
           return Math.max(a, b);
         });
-        var index = results.indexOf(max)
-        setoutput(expressions[index])
+        var index = results.indexOf(max);
+        setoutput(expressions[index]);
 
       }
       setResult(faces);
-
     }
+
   };
   var model = null
   var modelLastUpdated = null;
@@ -104,17 +107,16 @@ function App() {
   }
 
 
-
   const loadmodel = async () => {
     console.log(window.innerWidth, "innnnnnnner")
     if ('indexedDB' in window) {
       try {
         model = await tf.loadLayersModel('indexeddb://' + INDEXEDDB_KEY);
-
       }
       catch (e) {
         console.log(e)
         model = await tf.loadLayersModel(MODEL_PATH);
+        console.log("???");
         model.save('indexeddb://' + INDEXEDDB_KEY)
 
       }
@@ -128,8 +130,6 @@ function App() {
     console.log("model loaded")
   }
 
-
-
   const camera = useRef();
   const cameraCanvas = useRef();
   const facecanvas = useRef()
@@ -142,14 +142,14 @@ function App() {
   const [video, setvideo] = useState(true)
   const [mode, setMode] = useState(false)
 
+  var indents = [];
+  indents = ["giận dữ", "chán ghét", "sợ hãi", "hạnh phúc", "sầu đời", "ngạc nhiên", "bình thường", "khinh thường"];
 
   return (
-
-
     <div>
       {isDownloadingModel && <div style={{ textAlign: "center", marginTop: "30vh" }}>
         <img src={loading} />
-        <h2 style={{ color: "#007c6c" }}>Downloading Model</h2>
+        {/* <h2 style={{ color: "#007c6c" }}>Đang tải model</h2> */}
 
       </div>}
 
@@ -158,25 +158,11 @@ function App() {
         <div className="titleDiv">
 
           <div style={{ marginLeft: "10px", marginTop: "1vh" }}>
-            <h4 style={{ fontSize: "4vh" }}>Facial Emotion Detector</h4>
-
-
-
-            <a className="nostyle" href={"https://github.com/amilkh/cs230-fer"}>Deep learning model</a>
-            <p className="nostyle">&nbsp;by&nbsp;</p>
-            <a className="nostyle" href={"https://cs230.stanford.edu/"}>Stanford University</a>
+            <h4 style={{ fontSize: "4vh" }}>Nhận diện cảm xúc con người</h4>
             <br />
 
-
-
-            <a className="nostyle" href={"https://github.com/amilkh/cs230-fer/tree/master/webapp"}>Web app</a>
-            <p className="nostyle">&nbsp;by&nbsp;</p>
-            <a className="nostyle" href={"https://se.neduet.edu.pk/"}>NED University</a>
-
-
-
             <div style={{ marginLeft: aspectRatio > 1 ? "92vw" : "80vw" }}>
-              <Switch
+              {/* <Switch
                 onChange={() => { setMode(!mode); reCapture() }}
                 uncheckedIcon={<FontAwesomeIcon style={{ marginLeft: "8px", marginTop: "5px" }} icon="video" />}
                 checkedIcon={<FontAwesomeIcon style={{ marginLeft: "10px", marginTop: "5px" }} icon="camera" />}
@@ -185,17 +171,10 @@ function App() {
                 offColor={"#b3f5e5"}
                 onColor={"#b3f5e5"}
                 width={60}
-              />
+              /> */}
             </div>
 
           </div>
-
-
-
-
-
-
-
         </div>
 
 
@@ -207,19 +186,20 @@ function App() {
             </div>
             {!video && <img className="camera" src={current} />}
           </div>
-          {!mode && <div>
-            {video && <button style={{ width: aspectRatio > 1 ? (window.innerWidth / 100) * 80 : "33vh" }} className="detect" onClick={() => getExpression()}>Detect My Emotion</button>}
-            {!video && <button style={{ width: aspectRatio > 1 ? (window.innerWidth / 100) * 80 : "33vh" }} className="detect" onClick={() => reCapture()}>Capture Again</button>}
-          </div>}
+          {/* {!mode && <div>
+            {video && <button style={{ width: aspectRatio > 1 ? (window.innerWidth / 100) * 80 : "33vh" }} className="detect" onClick={() => getExpression()}>Chụp ảnh</button>}
+            {!video && <button style={{ width: aspectRatio > 1 ? (window.innerWidth / 100) * 80 : "33vh" }} className="detect" onClick={() => reCapture()}>Thử lại</button>}
+          </div>} */}
         </div>
 
-
-
-
         <div className="footer">
-          {mode && output !== "" && <h3>I think you look {output}.</h3>}
-          {!mode && expression !== "" && <h3>I think you look {expression}.</h3>}
-
+          {/* <ul>
+            {indents.map(reptile => (
+              <li key={reptile}>{reptile}</li>
+            ))}
+          </ul> */}
+          {/* {mode && output !== "" && <h3>Bạn trông như {output}.</h3>}
+          {!mode && expression !== "" && <h3>Bạn trông như  {expression}.</h3>} */}
         </div>
 
 
